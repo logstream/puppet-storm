@@ -9,6 +9,8 @@
 #   parameters (e.g. `$nimbus_host`, `$local_dir`, `$local_hostname`, `$worker_childopts`).
 #
 class storm(
+  $base_link_dir           = $storm::params::base_dir,
+  $base_dir                = $storm::params::base_dir,
   $command                 = $storm::params::command,
   $config                  = $storm::params::config,
   $config_map              = $storm::params::config_map,
@@ -24,8 +26,17 @@ class storm(
   $logviewer_childopts     = $storm::params::logviewer_childopts,
   $nimbus_host             = $storm::params::nimbus_host,
   $nimbus_childopts        = $storm::params::nimbus_childopts,
+
   $package_name            = $storm::params::package_name,
   $package_ensure          = $storm::params::package_ensure,
+  $version                 = false,
+  $autoupgrade             = $storm::params::autoupgrade,
+  $package_provider        = 'package',
+  $package_url             = undef,
+  $package_dir             = $storm::params::package_dir,
+  $purge_package_dir       = false,
+  $package_dl_timeout      = 600,  # package download timeout
+
   $service_autorestart     = hiera('storm::service_autorestart', $storm::params::service_autorestart),
   $service_enable          = hiera('storm::service_enable', $storm::params::service_enable),
   $service_ensure          = $storm::params::service_ensure,
@@ -106,6 +117,9 @@ class storm(
   validate_string($worker_childopts)
   validate_array($zookeeper_servers)
 
+  # package(s)
+  class { 'storm::package': }
+
   include '::storm::users'
   include '::storm::install'
   include '::storm::config'
@@ -117,6 +131,7 @@ class storm(
   anchor { 'storm::end': }
 
   Anchor['storm::begin']
+  -> Class['::storm::package']
   -> Class['::storm::users']
   -> Class['::storm::install']
   -> Class['::storm::config']

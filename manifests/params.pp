@@ -1,21 +1,23 @@
 # == Class storm::params
 #
 class storm::params {
-  $command                 = '/opt/storm/bin/storm'
-  $config                  = '/opt/storm/conf/storm.yaml'
+  $base_dir                = '/opt/storm'
+  $command                 = "${base_dir}/bin/storm"
+  $config                  = "${base_dir}/conf/storm.yaml"
   $config_map              = {}
   $config_template         = 'storm/storm.yaml.erb'
-  $gid                     = 53001
-  $group                   = 'storm'
+  $gid                     = 0
+  $group                   = 'service'
   $group_ensure            = 'present'
   $local_dir               = '/app/storm'
   $local_hostname          = $::hostname
   $log_dir                 = '/var/log/storm'
-  $logback                 = '/opt/storm/logback/cluster.xml'
+  $logback                 = "${base_dir}/logback/cluster.xml"
   $logback_template        = 'storm/cluster.xml.erb'
   $logviewer_childopts     = '-Xmx128m -Djava.net.preferIPv4Stack=true'
   $nimbus_host             = 'nimbus1'
   $nimbus_childopts        = '-Xmx256m -Djava.net.preferIPv4Stack=true'
+  $autoupgrade             = false
   $package_name            = 'storm'
   $package_ensure          = 'present'
   $service_autorestart     = true
@@ -45,17 +47,42 @@ class storm::params {
   $user_manage             = true
   $user_managehome         = true
   $worker_childopts        = '-Xmx256m -Djava.net.preferIPv4Stack=true'
-  $zookeeper_servers       = ['zookeeper1']
+  $zookeeper_servers       = ['localhost']
 
   # Parameters not exposed to the user via init.pp
-  $storm_rpm_log_dir       = '/opt/storm/logs' # Must match RPM layout; use $log_dir to define actual logging directory
+  $storm_rpm_log_dir       = "${base_dir}/logs" # Must match RPM layout; use $log_dir to define actual logging directory
   validate_absolute_path($storm_rpm_log_dir)
 
   case $::osfamily {
     'RedHat': {}
+    'Debian': {}
 
     default: {
       fail("The ${module_name} module is not supported on a ${::osfamily} based system.")
     }
   }
+
+  case $::kernel {
+    'Linux': {
+      $package_dir = "${base_dir}/swdl"
+    }
+    default: {
+      fail("\"${module_name}\" provides no config directory default value for \"${::kernel}\"")
+    }
+  }
+
+  # Download tool
+  case $::kernel {
+    'Linux': {
+      $download_tool = 'wget -O'
+    }
+    'Darwin': {
+      $download_tool = 'curl -o'
+    }
+    default: {
+      fail("\"${module_name}\" provides no download tool default value
+           for \"${::kernel}\"")
+    }
+  }
+
 }
