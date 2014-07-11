@@ -13,6 +13,7 @@ class storm(
   $base_dir                = $storm::params::base_dir,
   $command                 = $storm::params::command,
   $config                  = $storm::params::config,
+  $config_dir              = $storm::params::config_dir,
   $config_map              = $storm::params::config_map,
   $config_template         = $storm::params::config_template,
   $gid                     = $storm::params::gid,

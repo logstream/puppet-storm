@@ -1,6 +1,11 @@
 # == Class storm::config
 #
 class storm::config inherits storm {
+  file { $config_dir:
+    ensure => directory,
+    owner => root,
+    group => root,
+  }
 
   file { $config:
     ensure  => file,

@@ -3,6 +3,7 @@
 class storm::params {
   $base_dir                = '/opt/storm'
   $command                 = "${base_dir}/bin/storm"
+  $config                  = "${base_dir}/conf"
   $config                  = "${base_dir}/conf/storm.yaml"
   $config_map              = {}
   $config_template         = 'storm/storm.yaml.erb'
