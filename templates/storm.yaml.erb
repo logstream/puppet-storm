@@ -38,7 +38,7 @@ storm.messaging.transport: "<%= @storm_messaging_transport %>"
 <%=
   require 'yaml'
   @config_map.to_yaml.lines.
-    select { |s| s =~ /^[^-]{3}/ }.
+    select { |s| s =~ /^[^-]{3}/ }.sort.
     map { |s| s.sub(/^  /, '').rstrip }.
     join("\n")
 
